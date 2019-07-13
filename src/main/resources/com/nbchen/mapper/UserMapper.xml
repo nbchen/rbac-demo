@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nbchen.mapper.UserMapper" >
+
+    <resultMap id="userMapper" type="Users">
+        <id property="username" column="username"/>
+        <result property="userpwd" column="userpwd"/>
+        <!--配置关联对象Roles-->
+        <association property="roles" javaType="Roles">
+            <id property="roleid" column="roleid"/>
+            <result property="rolename" column="rolename"/>
+        </association>
+        <!--配置关联对象Menus-->
+        <collection property="menus" ofType="Menus">
+            <id property="menuid" column="menuid"/>
+            <result property="menuname" column="menuname"/>
+            <result property="menuurl" column="menuurl"/>
+            <result property="fatherid" column="fatherid"/>
+        </collection>
+        <!--配置关联对象Funs-->
+        <collection property="funs" ofType="Funs">
+            <id property="funid" column="funid"/>
+            <result property="funname" column="funname"/>
+            <result property="funurl" column="funurl"/>
+        </collection>
+    </resultMap>
+    
+    <!--查询一个用户拥有角色对应的菜单权限-->
+    <select id="selectUserByname" parameterType="String" resultMap="userMapper">
+        SELECT
+            *
+        FROM
+            users u
+            LEFT JOIN roles r ON u.role_id = r.roleid
+            LEFT JOIN roles_menus rm ON r.roleid = rm.roles_id
+            LEFT JOIN menus m ON rm.menus_id = m.menuid
+            LEFT JOIN funs f ON m.menuid = f.menu_id
+        WHERE
+            u.username = #{username}
+    </select>
+</mapper>
